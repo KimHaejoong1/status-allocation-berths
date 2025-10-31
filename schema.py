@@ -32,11 +32,12 @@ KOR_MAP = {
     "f": "f",
     "e": "e",
     "접안": "berthing",     
-    "검역": "quarantine",   
+    "검역": "quarantine",
+    "도선": "pilot",   
 }
 
 # 표준 출력 순서
-STD_ORDER = ["terminal", "berth", "vessel", "voyage", "start", "end", "stype", "bp", "f", "e", "berthing", "quarantine","y_m"]
+STD_ORDER = ["terminal", "berth", "vessel", "voyage", "start", "end", "stype", "bp", "f", "e", "berthing", "quarantine","pilot","y_m"]
 
 # ---------------------------------------------------------
 # 유틸
@@ -138,7 +139,7 @@ def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
     out["terminal"] = out["berth"].apply(_infer_terminal_from_berth)
 
     # 4) 문자열 컬럼 기본 처리
-    for col in ["vessel", "voyage", "stype", "remark", "berthing", "quarantine"]:
+    for col in ["vessel", "voyage", "stype", "remark", "berthing", "quarantine", "pilot"]:
         if col not in out:
             out[col] = ""
         out[col] = out[col].astype(str).str.strip()
@@ -276,7 +277,7 @@ def sync_raw_with_norm(raw_df: pd.DataFrame, norm_df: pd.DataFrame) -> pd.DataFr
         inv.setdefault(v, []).append(k)
 
     # 표준 → 원본 반영 후보
-    std_cols = ["start","end","voyage","vessel","stype","berth","bp","f","e","berthing","quarantine"]
+    std_cols = ["start","end","voyage","vessel","stype","berth","bp","f","e","berthing","quarantine","pilot"]
     g = norm_df.set_index("row_id")
     for rid, row in g.iterrows():
         if rid not in out["row_id"].values:
