@@ -11,15 +11,10 @@
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-playwright install chromium
 streamlit run app.py
 ```
 
 ## 배포
 - **Streamlit Cloud**: `requirements.txt` + `packages.txt` 추가. 앱 첫 실행 시 브라우저 바이너리 설치를 위해 `app.py`가 `playwright install chromium`을 한 번 시도합니다.
-
-## 데이터
-- `data/berths.csv`: 선석 meter 구간
-- `data/vessels_loa.csv`: 선박 LOA(미정이면 생략 가능)
 
 > 외부(BPTC) 페이지에 **쓰기**는 하지 않습니다(읽기 전용 크롤링).
