@@ -209,17 +209,17 @@ def render_timeline_week(df: pd.DataFrame, terminal: str, title: str):
             textposition="middle center",
         ))
 
-        # 2) 중앙 아래줄: 검역(있을 때만)
+        # 2) 중앙 위줄: 검역(있을 때만)
         quarantine = (r.get("quarantine") or "").strip()
         if quarantine:
-            # '아래' = 반전축에서 y를 약간 크게(+), 막대 범위 안쪽으로
-            y_quar = min(mid_y + 18, y1 - 4)  # 너무 내려가면 바깥으로 나가니 클램프
+            # '위' = 반전축에서 y를 약간 작게(-), 막대 범위 안쪽으로
+            y_quar = max(mid_y - 18, y0 + 4)  # 너무 올라가면 바깥으로 나가니 클램프
             fig.add_trace(go.Scatter(
                 x=[mid_t], y=[y_quar], mode="text",
                 text=[quarantine],
                 hoverinfo="skip",
                 showlegend=False,
-                textposition="bottom center",
+                textposition="top center",  # 위쪽 정렬
                 textfont=dict(color="rgba(220,30,30,0.95)"),  # ✅ 빨간색 적용
             ))
         # (수정) 막대 높이의 4% 또는 최소 12m만큼 안쪽으로
