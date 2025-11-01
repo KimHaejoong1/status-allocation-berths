@@ -206,3 +206,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# 개인용 파일 제외
+RULE.md
+run.bat

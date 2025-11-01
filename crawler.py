@@ -120,10 +120,25 @@ def get_all_bp_data(date=None):
             bitt    = m.group(11)
             note, plan_status = _note_status_from_plan_cd(plan_cd)
 
+            # a 태그 안에서: 두 번째 section → 두 번째 p → span → b 태그에서 "도선" 확인
+            has_pilot = False
+            sections = a_tag.find_all("section", recursive=False)  # a 태그의 직계 자식 section만
+            if len(sections) >= 2:
+                second_section = sections[1]  # 두 번째 section
+                p_tags = second_section.find_all("p", recursive=False)  # section의 직계 자식 p만
+                if len(p_tags) >= 2:
+                    second_p = p_tags[1]  # 두 번째 p
+                    span_tag = second_p.find("span")
+                    if span_tag:
+                        b_tag = span_tag.find("b")
+                        if b_tag and b_tag.get_text(strip=True) == "도선":
+                            has_pilot = True
+
             bp_dict[(ship_cd, call_no)] = {
                 "bitt": bitt,             # 예: "111 ( F: 1, E: 143)"
                 "note": note,             # 예: "양하 프래닝까지 완료"
-                "plan_status": plan_status
+                "plan_status": plan_status,
+                "pilot": "도선" if has_pilot else ""  # 도선 정보 추가
             }
     return bp_dict
 
@@ -143,7 +158,7 @@ def add_bp_to_dataframe(df, date=None):
         return df
 
     bp_map = get_all_bp_data(date)
-    bp_list, f_list, e_list, note_list, status_list = [], [], [], [], []
+    bp_list, f_list, e_list, note_list, status_list, pilot_list = [], [], [], [], [], []
 
     for _, row in df.iterrows():
         mocen = str(row["모선항차"]) if pd.notna(row["모선항차"]) else ""
@@ -155,20 +170,23 @@ def add_bp_to_dataframe(df, date=None):
                 bp_str = info.get("bitt")
                 note   = info.get("note", "")
                 status = info.get("plan_status", "")
+                pilot  = info.get("pilot", "")
             else:
                 # 과거 문자열만 반환하던 케이스와 호환
                 bp_str = info
-                note, status = "", ""
+                note, status, pilot = "", "", ""
             bp, f, e = parse_bp(bp_str)
         else:
-            bp, f, e, note, status = (None, None, None, "", "")
+            bp, f, e, note, status, pilot = (None, None, None, "", "", "")
 
         bp_list.append(bp); f_list.append(f); e_list.append(e)
         note_list.append(note); status_list.append(status)
+        pilot_list.append(pilot)
 
     df["bp"], df["f"], df["e"] = bp_list, f_list, e_list
     df["note"] = note_list
     df["plan_status"] = status_list
+    df["도선"] = pilot_list
     return df
 
 # ---------------------------------------------------------
