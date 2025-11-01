@@ -319,6 +319,7 @@ def render_timeline_week(df: pd.DataFrame, terminal: str, title: str):
         range=[y_max, 0], dtick=Y_GRID_M,
         title=f"{terminal} length (m) — snap {Y_GRID_M}m",
         gridcolor="rgba(0,0,0,0.08)", zeroline=False,
+        fixedrange=True,  # Y축 범위 고정 (위아래 스크롤/줌 방지)
     )
     # 가로폭 넉넉 (가로 스크롤로 봄)
     fig.update_layout(
